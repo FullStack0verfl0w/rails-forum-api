@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  steamID: MyString
+  session: MyString
+  sessionEnd: 2020-01-12 19:07:47
+  status: false
+  lastTimeOnline: 2020-01-12 19:07:47
+  lastActivityTime: 2020-01-12 19:07:47
+  rightFlags: MyString
+  karma: 1
+  posts: MyText
+
+two:
+  steamID: MyString
+  session: MyString
+  sessionEnd: 2020-01-12 19:07:47
+  status: false
+  lastTimeOnline: 2020-01-12 19:07:47
+  lastActivityTime: 2020-01-12 19:07:47
+  rightFlags: MyString
+  karma: 1
+  posts: MyText
