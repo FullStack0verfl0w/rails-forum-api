@@ -23,8 +23,10 @@ class User < ApplicationRecord
             end
 
             if !user.steamData
-                if user.steamData != info
-                    user.steamData = info
+                user.steamData = info_json
+            else
+                if user.steamData != info_json
+                    user.steamData = info_json
                 end
             end
 
