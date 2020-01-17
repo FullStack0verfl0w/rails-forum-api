@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_12_160746) do
+ActiveRecord::Schema.define(version: 2020_01_17_122752) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "creatorSteamID", limit: 17
@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 2020_01_12_160746) do
 
   create_table "posts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "title"
-    t.text "text"
+    t.text "content"
     t.string "icon"
     t.string "creatorSteamID", limit: 17
     t.decimal "upvotes", precision: 10
@@ -37,20 +37,28 @@ ActiveRecord::Schema.define(version: 2020_01_12_160746) do
     t.string "name"
     t.text "description"
     t.string "icon"
-    t.integer "rightFlags"
+    t.text "canView"
     t.text "posts"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "user_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "name"
+    t.integer "rightFlags"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "steamID", limit: 17
-    t.string "session"
-    t.datetime "sessionEnd"
+    t.text "steamData"
+    t.string "token"
+    t.datetime "tokenEnd"
     t.boolean "status"
     t.datetime "lastTimeOnline"
     t.datetime "lastActivityTime"
-    t.integer "rightFlags"
+    t.string "userGroup"
     t.integer "karma"
     t.text "posts"
     t.datetime "created_at", precision: 6, null: false

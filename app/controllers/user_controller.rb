@@ -1,12 +1,9 @@
 class UserController < ApplicationController
     def create
         begin
-            @user = User.from_omniauth request.env['omniauth.auth']
+            @user = User.from_omniauth request.env['omniauth.auth'], session
         rescue Exception => e
             puts e.message
-        else
-            session[:token] = @user.session
-            session[:expires_at] = @user.sessionEnd
         end
         redirect_to root_path
     end

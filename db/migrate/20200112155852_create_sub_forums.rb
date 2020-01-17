@@ -4,7 +4,7 @@ class CreateSubForums < ActiveRecord::Migration[6.0]
       t.string :name
       t.text :description
       t.string :icon
-      t.integer :rightFlags
+      t.text :canView
       t.text :posts
 
       t.timestamps

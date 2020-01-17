@@ -2,12 +2,13 @@ class CreateUsers < ActiveRecord::Migration[6.0]
   def change
     create_table :users do |t|
       t.string :steamID, limit: 17
-      t.string :session
-      t.datetime :sessionEnd
+      t.text :steamData
+      t.string :token
+      t.datetime :tokenEnd
       t.boolean :status
       t.datetime :lastTimeOnline
       t.datetime :lastActivityTime
-      t.integer :rightFlags
+      t.string :userGroup
       t.integer :karma
       t.text :posts
 
