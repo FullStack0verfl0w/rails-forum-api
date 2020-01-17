@@ -2,6 +2,7 @@ class User < ApplicationRecord
     class << self
         def from_omniauth auth, session
             info = auth[:info]
+            info_json = auth[:extra][:raw_info].to_json
             now = Time::now
 
             user = find_or_initialize_by steamID: auth[:uid]
