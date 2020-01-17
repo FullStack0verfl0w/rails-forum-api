@@ -104,83 +104,66 @@ class SubForumController < ApplicationController
     end
 
     def show
-        now = Time::now
         id = params[:id]
         token = session[:token]
         status = :ok
 
         # Check token and find user with it
         if token
-            user = User.where("session = ? AND sessionEnd > ?", token, now).first
+            user = User.find_by "token = ? AND tokenEnd > ?", token, Time::now
         end
 
-        # Get a record from database by id
         begin
-            forum = SubForum.find(id)
+            # Get client's user group
+            if user
+                group = UserGroup.find_by name: user.userGroup
+            else
+                group = UserGroup.find_by name: UserGroup::DefaultGroups[:guest][:name]
+            end
 
-        # Tell client we're not found record
+            # Check user group flag for read
+            if group.has_flag UserGroup::RightFlags::FORUM_READ
+                forum = SubForum.find id
+            else
+                status = :unauthorized
+            end
+
+        # Tell client we have not found a record
         rescue ActiveRecord::RecordNotFound
             status = :not_found
-        rescue Exception => e
-            puts e.message
-            status = :internal_server_error
-        else
-            if user
-                user_has_read_flag = User::RightFlags.bit_set(user.rightFlags, User::RightFlags::FORUM_READ)
-
-                if !user_has_read_flag
-                    forum = nil
-                    status = :unauthorized
-                end
-            end
-
-            if forum
-                forum_has_read_flag = User::RightFlags.bit_set(forum.rightFlags, User::RightFlags::FORUM_READ)
-
-                if !forum_has_read_flag
-                    forum = nil
-                    status = :unauthorized
-                end
-            end
         end
 
         # Regenerate session token
         if user
-            user.session = user.generate_token
-            user.sessionEnd = now + User::SESSION_EXPIRY_TIME
-            user.lastActivityTime = now
-            user.save!
-            session[:token] = user.session
-            session[:expires_at] = user.sessionEnd
+            user.generate_token session
         end
         render json: {data: forum}, status: status
     end
 
     def destroy
         id = params[:id]
-        now = Time::now
         token = session[:token]
         status = :ok
 
         # Check token and find user with it
         if token
-            user = User.where("session = ? AND sessionEnd > ?", token, now).first
+            user = User.find_by "token = ? AND tokenEnd > ?", token, Time::now
         end
 
         # Check user's delete flag
         if user
-            has_user_delete_flag = User::RightFlags.bit_set(user.rightFlags, User::RightFlags::FORUM_DELETE)
+            group = UserGroup.find_by name: user.userGroup
+        else
+            group = UserGroup.find_by name: UserGroup::DefaultGroups[:guest][:name]
+        end
 
-            if has_user_delete_flag
-                begin
-                    forum = SubForum.find(id)
-                rescue ActiveRecord::RecordNotFound
-                    status = :bad_request
-                else
-                    forum.delete()
-                end
+        if group.has_flag UserGroup::RightFlags::FORUM_DELETE
+            begin
+                forum = SubForum.find id
+            rescue ActiveRecord::RecordNotFound
+                status = :not_found
             else
-                status = :unauthorized
+                forum.delete
             end
         else
             status = :unauthorized
@@ -188,12 +171,7 @@ class SubForumController < ApplicationController
 
         # Regenerate session token
         if user
-            user.session = user.generate_token
-            user.sessionEnd = now + User::SESSION_EXPIRY_TIME
-            user.lastActivityTime = now
-            user.save!
-            session[:token] = user.session
-            session[:expires_at] = user.sessionEnd
+            user.generate_token session
         end
         render status: status
     end
