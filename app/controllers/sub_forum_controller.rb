@@ -70,7 +70,9 @@ class SubForumController < ApplicationController
                 end
 
                 # Regenerate session token
-                user.generate_token session
+                if user
+                    user.generate_token session
+                end
             else
                 status = :unauthorized
             end
@@ -125,7 +127,9 @@ class SubForumController < ApplicationController
                 end
 
                 # Regenerate session token
-                user.generate_token session
+                if user
+                    user.generate_token session
+                end
             else
                 status = :unauthorized
             end
