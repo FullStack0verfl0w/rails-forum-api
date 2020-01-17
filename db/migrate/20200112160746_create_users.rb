@@ -6,6 +6,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.string :token
       t.datetime :tokenEnd
       t.boolean :status
+      t.boolean :banned
       t.datetime :lastTimeOnline
       t.datetime :lastActivityTime
       t.string :userGroup

@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_122752) do
     t.string "token"
     t.datetime "tokenEnd"
     t.boolean "status"
+    t.boolean "banned"
     t.datetime "lastTimeOnline"
     t.datetime "lastActivityTime"
     t.string "userGroup"
