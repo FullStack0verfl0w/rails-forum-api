@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :sub_forum
-  root "application#not_found"
+  root "application#stub"
 
   post "/auth/steam/callback" => "user#create"
   post "/logout" => "user#destroy_session"
