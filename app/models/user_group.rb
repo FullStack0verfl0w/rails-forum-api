@@ -1,7 +1,7 @@
 class UserGroup < ApplicationRecord
     def self.has_flag user_group, flag
         begin
-            group = UserGroup.where(name: user_group).first
+            group = UserGroup.find_by! name: user_group
         rescue ActiveRecord::RecordNotFound
             return false
         else

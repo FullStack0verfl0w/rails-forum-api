@@ -50,7 +50,7 @@ class User < ApplicationRecord
         # Generate our token
         token = loop do
             random = SecureRandom.base58()
-            break random unless User.exists?(token: random)
+            break random unless User.exists? token: random
         end
 
         self.token = token
