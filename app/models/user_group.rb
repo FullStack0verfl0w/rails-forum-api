@@ -99,5 +99,5 @@ class UserGroup < ApplicationRecord
                         UserGroup::RightFlags::USERGROUP_DELETE |
                         UserGroup::RightFlags::USERGROUP_CHANGE
         },
-    }
+    }.freeze
 end
