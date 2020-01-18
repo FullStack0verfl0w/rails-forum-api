@@ -16,7 +16,7 @@ class User < ApplicationRecord
             else
                 # Reset user group if client's group doesn't exist
                 begin
-                    group = UserGroup.where(name: user.userGroup).first!
+                    group = UserGroup.find_by name: user.userGroup
                 rescue
                     user.userGroup = "user"
                 end
