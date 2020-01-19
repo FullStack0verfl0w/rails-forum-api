@@ -1,46 +1,44 @@
 class User < ApplicationRecord
-    class << self
-        def from_omniauth auth, session
-            info = auth[:info]
-            info_json = auth[:extra][:raw_info].to_json
-            now = Time::now
+    def self.from_omniauth auth, session
+        info = auth[:info]
+        info_json = auth[:extra][:raw_info].to_json
+        now = Time::now
 
-            user = find_or_initialize_by steamID: auth[:uid]
-            user.status = true
-            user.generate_token session
-            user.lastTimeOnline = now
+        user = find_or_initialize_by steamID: auth[:uid]
+        user.status = true
+        user.generate_token session
+        user.lastTimeOnline = now
 
-            # Set user group if it's not set
-            if !user.userGroup
+        # Set user group if it's not set
+        if !user.userGroup
+            user.userGroup = "user"
+        else
+            # Reset user group if client's group doesn't exist
+            begin
+                group = UserGroup.find_by name: user.userGroup
+            rescue
                 user.userGroup = "user"
-            else
-                # Reset user group if client's group doesn't exist
-                begin
-                    group = UserGroup.find_by name: user.userGroup
-                rescue
-                    user.userGroup = "user"
-                end
             end
-
-            if !user.steamData
-                user.steamData = info_json
-            else
-                if user.steamData != info_json
-                    user.steamData = info_json
-                end
-            end
-
-            if !user.karma
-                user.karma = 0
-            end
-
-            if !user.posts
-                user.posts = [].to_json
-            end
-
-            user.save!
-            return user
         end
+
+        if !user.steamData
+            user.steamData = info_json
+        else
+            if user.steamData != info_json
+                user.steamData = info_json
+            end
+        end
+
+        if !user.karma
+            user.karma = 0
+        end
+
+        if !user.posts
+            user.posts = [].to_json
+        end
+
+        user.save!
+        return user
     end
 
     # Generates new token and saves it to session and server database
