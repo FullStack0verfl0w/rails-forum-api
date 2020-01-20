@@ -17,7 +17,11 @@ class UserGroupController < ApplicationController
         status = :ok
 
         user = User.find_by "token = ? AND tokenEnd > ?", token, Time::now if token
-        group = UserGroup.find_by(name: name)
+        begin
+            group = UserGroup.find_by! name: name
+        rescue ActiveRecord::RecordNotFound
+            status = :not_found
+        end
 
         user.generate_token session if user
 
@@ -25,19 +29,11 @@ class UserGroupController < ApplicationController
     end
 
     def create
-        token = session[:token]
-        name = params[:name]
-        right_flags = params[:rightFlags].to_i
-        status = :ok
+        status, data = ApplicationController.check_rights(params, session, UserGroup::RightFlags::USERGROUP_CREATE) { |status, params, session|
+            name = params[:name]
+            right_flags = params[:rightFlags].to_i
+            puts "right flags #{right_flags}"
 
-        user = User.find_by "token = ? AND tokenEnd > ?", token, Time::now if token
-        group = if user
-            UserGroup.find_by name: user.userGroup
-        else
-            UserGroup.find_by name: UserGroup::DefaultGroups[:guest][:name]
-        end
-
-        if group.has_flag UserGroup::RightFlags::USERGROUP_CREATE
             if !name.blank? && !UserGroup.exists?(name: name) && right_flags != 0
                 user_group = UserGroup.create(
                     name: name,
@@ -47,28 +43,16 @@ class UserGroupController < ApplicationController
             else
                 status = :bad_request
             end
-        else
-            status = :unauthorized
-        end
-
+            [status, data]
+        }
         render status: status
     end
 
     def update
-        token = session[:token]
-        id = params[:id] # id is actually old name
-        name = params[:name]
-        right_flags = params[:rightFlags].to_i
-        status = :ok
-
-        user = User.find_by "token = ? AND tokenEnd > ?", token, Time::now if token
-        group = if user
-            UserGroup.find_by name: user.userGroup
-        else
-            UserGroup.find_by name: UserGroup::DefaultGroups[:guest][:name]
-        end
-
-        if group.has_flag UserGroup::RightFlags::USERGROUP_CREATE
+        status, data = ApplicationController.check_rights(params, session, UserGroup::RightFlags::USERGROUP_MODIFY) { |status, params, session|
+            id = params[:id]
+            name = params[:name]
+            right_flags = params[:rightFlags]
             if !name.blank? && !id.blank? && right_flags != 0
                 begin
                     user_group = UserGroup.find_by! name: id
@@ -81,10 +65,8 @@ class UserGroupController < ApplicationController
             else
                 status = :bad_request
             end
-        else
-            status = :unauthorized
-        end
-
+            [status, data]
+        }
         render status: status
     end
 
