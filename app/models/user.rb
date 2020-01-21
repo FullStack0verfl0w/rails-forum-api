@@ -29,14 +29,6 @@ class User < ApplicationRecord
             end
         end
 
-        if !user.karma
-            user.karma = 0
-        end
-
-        if !user.posts
-            user.posts = [].to_json
-        end
-
         user.save!
         return user
     end
