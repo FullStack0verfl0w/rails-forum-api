@@ -20,7 +20,7 @@ class ApplicationController < ActionController::API
 
         # Find rightflag in user group
         if group.has_flag right_flag
-            status, data = callback.call(status, params, session)
+            status, data = callback.call(status, params, session, user, group)
         else
             # GTFO if we didn't
             status = :unauthorized
