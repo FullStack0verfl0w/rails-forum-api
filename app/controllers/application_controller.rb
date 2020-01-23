@@ -18,8 +18,12 @@ class ApplicationController < ActionController::API
             UserGroup.find_by name: UserGroup::DefaultGroups[:guest][:name]
         end
 
+        # Check ban status
+        if group.has_flag UserGroup::RightFlags::USER_BANNED
+            status = :forbidden
+
         # Find rightflag in user group
-        if group.has_flag right_flag
+        elsif group.has_flag right_flag
             status, data = callback.call(status, params, session, user, group)
         else
             # GTFO if we didn't
