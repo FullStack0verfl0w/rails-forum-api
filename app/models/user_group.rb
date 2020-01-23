@@ -40,6 +40,11 @@ class UserGroup < ApplicationRecord
         USERGROUP_MODIFY    = 131072  # Can user modify user groups
         USERGROUP_DELETE    = 262144  # Can user delete user groups
         USERGROUP_CHANGE    = 524288  # Can user change user group of another user
+
+        USER_BANNED         = 1048576 # User is banned
+
+        USER_CAN_UPVOTE     = 2097152 # Can user upvote threads and comments
+        USER_CAN_DOWNVOTE   = 4194304 # Can user downvote threads and comments
     end
 
     DefaultGroups = {
@@ -67,7 +72,10 @@ class UserGroup < ApplicationRecord
                         UserGroup::RightFlags::COMMENT_CREATE |
                         UserGroup::RightFlags::COMMENT_READ |
                         UserGroup::RightFlags::COMMENT_MODIFY |
-                        UserGroup::RightFlags::COMMENT_DELETE_OWN
+                        UserGroup::RightFlags::COMMENT_DELETE_OWN |
+
+                        UserGroup::RightFlags::USER_CAN_UPVOTE |
+                        UserGroup::RightFlags::USER_CAN_DOWNVOTE
         },
 
         # Template for super admin group
@@ -97,7 +105,17 @@ class UserGroup < ApplicationRecord
                         UserGroup::RightFlags::USERGROUP_CREATE |
                         UserGroup::RightFlags::USERGROUP_MODIFY |
                         UserGroup::RightFlags::USERGROUP_DELETE |
-                        UserGroup::RightFlags::USERGROUP_CHANGE
+                        UserGroup::RightFlags::USERGROUP_CHANGE |
+
+                        UserGroup::RightFlags::USER_CAN_UPVOTE |
+                        UserGroup::RightFlags::USER_CAN_DOWNVOTE
         },
+
+        # Template for banned users
+        # Can't do anything after authorization
+        banned: {
+            name: "banned",
+            rightFlags: UserGroup::RightFlags::USER_BANNED
+        }
     }.freeze
 end
