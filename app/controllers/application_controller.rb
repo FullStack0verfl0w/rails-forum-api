@@ -32,4 +32,12 @@ class ApplicationController < ActionController::API
         end
         [status, data]
     end
+
+    # Icon enum
+    module Icons
+        NONE    = 0
+        DEFAULT = 1
+        LOCKED  = 2
+        PINNED  = 3
+    end
 end
