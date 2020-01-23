@@ -9,7 +9,7 @@ class CreatePosts < ActiveRecord::Migration[6.0]
       t.decimal :subforum, :null => false
       t.decimal :upvotes, :null => false, :default => 0
       t.decimal :downvotes, :null => false, :default => 0
-      t.text :comments, :null => false, :default => [""].to_json
+      t.text :comments, :null => false, :default => [].to_json
 
       t.timestamps
     end

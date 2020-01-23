@@ -11,7 +11,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.datetime :lastActivityTime
       t.string :userGroup, :null => false, :default => "user"
       t.integer :karma, :null => false, :default => 0
-      t.text :posts, :null => false, :default => [""].to_json
+      t.text :posts, :null => false, :default => [].to_json
 
       t.timestamps
     end

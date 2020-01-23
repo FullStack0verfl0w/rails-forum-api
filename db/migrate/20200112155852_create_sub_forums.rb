@@ -5,7 +5,7 @@ class CreateSubForums < ActiveRecord::Migration[6.0]
       t.text :description, :null => false, :default => ""
       t.decimal :icon, :null => false, :default => ApplicationController::Icons::DEFAULT
       t.text :canView, :null => false, :default => ["all"].to_json
-      t.text :posts, :null => false, :default => [""].to_json
+      t.text :posts, :null => false, :default => [].to_json
 
       t.timestamps
     end
