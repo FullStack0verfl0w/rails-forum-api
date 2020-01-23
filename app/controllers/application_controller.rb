@@ -39,9 +39,9 @@ class ApplicationController < ActionController::API
 
     # Icon enum
     Icons = {
-        NONE:    0
-        DEFAULT: 1
-        LOCKED:  2
-        PINNED:  3
+        NONE:    0,
+        DEFAULT: 1,
+        LOCKED:  2,
+        PINNED:  3,
     }
 end
