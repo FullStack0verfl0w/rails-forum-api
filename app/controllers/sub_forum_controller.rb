@@ -103,4 +103,8 @@ class SubForumController < ApplicationController
         }
         render status: status
     end
+
+    # We'll use format for getting posts from sub forum like this: sub_forum/:sub_forum_id/posts(.:format)
+    # So include SubForumPostsController module here
+    include PostsController
 end
