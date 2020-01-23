@@ -3,7 +3,7 @@ class CreatePosts < ActiveRecord::Migration[6.0]
     create_table :posts do |t|
       t.string :title, :null => false
       t.text :content, :null => false
-      t.string :icon, :null => false, :default => "default"
+      t.decimal :icon, :null => false, :default => ApplicationController::Icons::DEFAULT
       t.string :creatorSteamID, limit: 17
       t.boolean :pinned, :null => false, :default => false
       t.decimal :subforum, :null => false
