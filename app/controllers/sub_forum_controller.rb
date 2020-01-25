@@ -12,7 +12,7 @@ class SubForumController < ApplicationController
         status, data = ApplicationController.check_rights(params, session, UserGroup::RightFlags::FORUM_CREATE) { |status, params, session|
             name = params[:title] || ""
             desc = params[:desc] || ""
-            icon = params[:icon] || SubForum::ICONS[0]
+            icon = params[:icon]
             can_view = params[:canView] || [:all].to_json
 
             # Check name and description length
@@ -20,7 +20,7 @@ class SubForumController < ApplicationController
                 (name.length > SubForum::TITLE_MAX_LEN && SubForum::TITLE_MAX_LEN != -1) ||
                 (desc.length < SubForum::DESC_MIN_LEN && SubForum::DESC_MIN_LEN != -1) ||
                 (desc.length > SubForum::DESC_MAX_LEN && SubForum::DESC_MAX_LEN != -1) ||
-                !SubForum::ICONS.include?(icon)
+                (icon && !ApplicationController::Icons.has_value?(icon))
 
                 status = :bad_request
 
@@ -29,9 +29,9 @@ class SubForumController < ApplicationController
                 forum = SubForum.create(
                     name: name,
                     description: desc,
-                    icon: icon,
                     canView: can_view
                 )
+                forum.icon = icon if icon
                 forum.save!
             end
             [status, nil]
@@ -43,7 +43,7 @@ class SubForumController < ApplicationController
         status, data = ApplicationController.check_rights(params, session, UserGroup::RightFlags::FORUM_MODIFY) { |status, params, session|
             name = params[:title] || ""
             desc = params[:desc] || ""
-            icon = params[:icon] || SubForum::ICONS[0]
+            icon = params[:icon]
             can_view = params[:canView] || [:all].to_json
 
             # Find existing sub forum
@@ -60,7 +60,7 @@ class SubForumController < ApplicationController
                     (name.length > SubForum::TITLE_MAX_LEN && SubForum::TITLE_MAX_LEN != -1) ||
                     (desc.length < SubForum::DESC_MIN_LEN && SubForum::DESC_MIN_LEN != -1) ||
                     (desc.length > SubForum::DESC_MAX_LEN && SubForum::DESC_MAX_LEN != -1) ||
-                    !SubForum::ICONS.include?(icon)
+                    (icon && !ApplicationController::Icons.has_value?(icon))
 
                     status = :bad_request
 
@@ -68,7 +68,7 @@ class SubForumController < ApplicationController
                 else
                     forum.name = name
                     forum.description = desc
-                    forum.icon = icon
+                    forum.icon = icon if icon
                     forum.canView = can_view
                     forum.save!
                 end
