@@ -97,6 +97,12 @@ class SubForumController < ApplicationController
             rescue ActiveRecord::RecordNotFound
                 status = :not_found
             else
+                # First delete every post in sub forum
+                posts = JSON.parse forum.threads
+                posts.each do |post_id|
+                    post = Post.find_by subforum: post_id
+                    post.delete if post
+                end
                 forum.delete
             end
             [status, nil]
@@ -105,6 +111,9 @@ class SubForumController < ApplicationController
     end
 
     # We'll use format for getting posts from sub forum like this: sub_forum/:sub_forum_id/posts(.:format)
-    # So include SubForumPostsController module here
+    # So include PostsController module here
     include PostsController
+
+    # Same with CommentsController
+    include CommentsController
 end
