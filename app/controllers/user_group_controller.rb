@@ -32,7 +32,6 @@ class UserGroupController < ApplicationController
         status, data = ApplicationController.check_rights(params, session, UserGroup::RightFlags::USERGROUP_CREATE) { |status, params, session|
             name = params[:name]
             right_flags = params[:rightFlags].to_i
-            puts "right flags #{right_flags}"
 
             if !name.blank? && !UserGroup.exists?(name: name) && right_flags != 0
                 user_group = UserGroup.create(
