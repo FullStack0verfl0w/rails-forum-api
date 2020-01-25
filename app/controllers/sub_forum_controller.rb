@@ -97,11 +97,19 @@ class SubForumController < ApplicationController
             rescue ActiveRecord::RecordNotFound
                 status = :not_found
             else
-                # First delete every post in sub forum
+                # First, delete every post (in every post delete all comments) in sub forum
                 posts = JSON.parse forum.threads
                 posts.each do |post_id|
                     post = Post.find_by subforum: post_id
-                    post.delete if post
+                    if post
+                        # Delete all comments
+                        comments = JSON.parse post.comments
+                        comments.each do |comment_id|
+                            comment = Comment.find_by thread: comment_id
+                            comment.delete if comment
+                        end
+                        post.delete
+                    end
                 end
                 forum.delete
             end
