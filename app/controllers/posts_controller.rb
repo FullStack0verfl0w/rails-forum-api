@@ -36,9 +36,9 @@ module PostsController
             id = params[:id].to_i
             post_id = params[:post].to_i
 
-            post = Post.where("id = ? AND subforum = ?", post_id, id)
+            post = Post.find_by("id = ? AND subforum = ?", post_id, id)
 
-            if !SubForum.exists?(id: id) || !post.exists?
+            if !SubForum.exists?(id: id) || !post.blank?
                 status = :not_found # Sub Forum or Post doesn't exist
             end
 
@@ -54,7 +54,7 @@ module PostsController
             content = params[:content]
             icon = params[:icon]
 
-            if id.blank? || title.blank? || content.blank? || user.blank? || !ApplicationController::Icons.has_value?(icon)
+            if id.blank? || title.blank? || content.blank? || user.blank? || (icon && !ApplicationController::Icons.has_value?(icon))
                 status = :bad_request
             elsif !SubForum.exists?(id: id)
                 status = :not_found # Sub Forum doesn't exist
@@ -62,16 +62,16 @@ module PostsController
                 post = Post.create(
                     title: title,
                     content: content,
-                    icon: icon,
                     subforum: id,
                     creatorSteamID: user.steamID
                 )
+                post.icon = icon if icon
                 post.save!
 
                 forum = SubForum.find id
-                forum_posts = JSON.parse forum.posts
+                forum_posts = JSON.parse forum.threads
                 forum_posts.push post.id
-                forum.posts = forum_posts.to_json
+                forum.threads = forum_posts.to_json
                 forum.save!
             end
 
@@ -90,14 +90,19 @@ module PostsController
 
             if id.blank? || title.blank? || content.blank? || user.blank? || !ApplicationController::Icons.has_value?(icon)
                 status = :bad_request
-            elsif !SubForum.exists?(id: id) || !Post.where("id = ? AND subforum = ?", post_id, id).exists?
+            elsif !SubForum.exists?(id: id) || !Post.find_by("id = ? AND subforum = ?", post_id, id).exists?
                 status = :not_found # Sub Forum or Post doesn't exist
             else
                 post = Post.find(id)
-                post.title = title
-                post.content = content
-                post.icon = icon
-                post.save!
+
+                if user.steamID == post.creatorSteamID
+                    post.title = title
+                    post.content = content
+                    post.icon = icon
+                    post.save!
+                else
+                    status = :forbidden
+                end
             end
 
             [status, data]
@@ -120,7 +125,7 @@ module PostsController
                     post = Post.find_by "id = ? AND subforum = ?", post_id, subforum_id
                     if post.creatorSteamID == user.steamID
                         forum = SubForum.find subforum_id
-                        forum_posts = JSON.parse forum.posts
+                        forum_posts = JSON.parse forum.threads
                         forum_posts.delete post.id
                         forum.posts = forum_posts.to_json
                         forum.save!
@@ -153,7 +158,7 @@ module PostsController
                         post = Post.find_by "id = ? AND subforum = ?", post_id, subforum_id
 
                         forum = SubForum.find subforum_id
-                        forum_posts = JSON.parse forum.posts
+                        forum_posts = JSON.parse forum.threads
                         forum_posts.delete post.id
                         forum.posts = forum_posts.to_json
                         forum.save!
@@ -172,19 +177,30 @@ module PostsController
 
     def upvote_post
         status, data = ApplicationController.check_rights(params, session, UserGroup::RightFlags::USER_CAN_UPVOTE) { |status, params, session, user|
+            post_id = params[:post].to_i
             begin
-                post = Post.find params[:post]
+                post = Post.find post_id
             rescue ActiveRecord::RecordNotFound
                 status = :not_found
             else
-                post.upvotes += 1
-                post.save!
+                upvoted = JSON.parse user.postsUpvoted
 
-                creator = User.find_by steamID: post.creatorSteamID
+                if !upvoted.include? post.id
+                    post.upvotes += 1
+                    post.save!
 
-                if creator && creator.steamID != user.steamID
-                    creator.karma += 1
-                    creator.save!
+                    if user
+                        upvoted.push post.id
+                        user.postsUpvoted = upvoted.to_json
+                        user.save!
+                    end
+
+                    creator = User.find_by steamID: post.creatorSteamID
+
+                    if creator && creator.steamID != user.steamID
+                        creator.karma += 1
+                        creator.save!
+                    end
                 end
             end
             [status, data]
@@ -194,19 +210,30 @@ module PostsController
 
     def downvote_post
         status, data = ApplicationController.check_rights(params, session, UserGroup::RightFlags::USER_CAN_UPVOTE) { |status, params, session, user|
+            post_id = params[:post].to_i
             begin
-                post = Post.find params[:post]
+                post = Post.find post_id
             rescue ActiveRecord::RecordNotFound
                 status = :not_found
             else
-                post.downvotes += 1
-                post.save!
+                downvoted = JSON.parse user.postsDownvoted
 
-                creator = User.find_by steamID: post.creatorSteamID
+                if !downvoted.include? post.id
+                    post.downvotes += 1
+                    post.save!
 
-                if creator && creator.steamID != user.steamID
-                    creator.karma -= 1
-                    creator.save!
+                    if user
+                        downvoted.push post.id
+                        user.postsDownvoted = downvoted.to_json
+                        user.save!
+                    end
+
+                    creator = User.find_by steamID: post.creatorSteamID
+
+                    if creator && creator.steamID != user.steamID
+                        creator.karma -= 1
+                        creator.save!
+                    end
                 end
             end
             [status, data]
