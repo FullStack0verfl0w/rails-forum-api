@@ -45,6 +45,7 @@ class User < ApplicationRecord
 
         self.token = token
         self.tokenEnd = now + User::TOKEN_EXPIRY_TIME
+        self.status = true
         self.lastActivityTime = now
         self.save!
 
