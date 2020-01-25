@@ -132,7 +132,7 @@ module PostsController
 
                         post.destroy
                     else
-                        status = :unauthorized
+                        status = :forbidden
                     end
                 rescue ActiveRecord::RecordNotFound
                     status = :not_found

@@ -27,7 +27,7 @@ class ApplicationController < ActionController::API
             status, data = callback.call(status, params, session, user, group)
         else
             # GTFO if we didn't
-            status = :unauthorized
+            status = :forbidden
         end
 
         # Regenerate session token
