@@ -14,31 +14,35 @@ ActiveRecord::Schema.define(version: 2020_01_17_122752) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "creatorSteamID", limit: 17
-    t.text "content"
-    t.decimal "upvotes", precision: 10
-    t.decimal "downvotes", precision: 10
+    t.decimal "thread", precision: 10, null: false
+    t.text "content", null: false
+    t.decimal "upvotes", precision: 10, default: "0", null: false
+    t.decimal "downvotes", precision: 10, default: "0", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "posts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "title"
-    t.text "content"
-    t.string "icon"
+    t.string "title", null: false
+    t.text "content", null: false
+    t.decimal "icon", precision: 10, default: "1", null: false
     t.string "creatorSteamID", limit: 17
-    t.decimal "upvotes", precision: 10
-    t.decimal "downvotes", precision: 10
-    t.text "comments"
+    t.boolean "pinned", default: false, null: false
+    t.boolean "closed", default: false, null: false
+    t.decimal "subforum", precision: 10, null: false
+    t.decimal "upvotes", precision: 10, default: "0", null: false
+    t.decimal "downvotes", precision: 10, default: "0", null: false
+    t.text "comments", default: "'[]'", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "sub_forums", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.string "icon"
-    t.text "canView"
-    t.text "posts"
+    t.string "name", null: false
+    t.text "description", default: "''", null: false
+    t.decimal "icon", precision: 10, default: "1", null: false
+    t.text "canView", default: "'[\"all\"]'", null: false
+    t.text "threads", default: "'[]'", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -51,17 +55,21 @@ ActiveRecord::Schema.define(version: 2020_01_17_122752) do
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "steamID", limit: 17
+    t.string "steamID", limit: 17, null: false
     t.text "steamData"
     t.string "token"
     t.datetime "tokenEnd"
-    t.boolean "status"
-    t.boolean "banned"
+    t.boolean "status", default: false, null: false
+    t.boolean "banned", default: false, null: false
     t.datetime "lastTimeOnline"
     t.datetime "lastActivityTime"
-    t.string "userGroup"
-    t.integer "karma"
-    t.text "posts"
+    t.string "userGroup", default: "user", null: false
+    t.integer "karma", default: 0, null: false
+    t.text "posts", default: "'[]'", null: false
+    t.text "postsUpvoted", default: "'[]'", null: false
+    t.text "postsDownvoted", default: "'[]'", null: false
+    t.text "commentsUpvoted", default: "'[]'", null: false
+    t.text "commentsDownvoted", default: "'[]'", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
