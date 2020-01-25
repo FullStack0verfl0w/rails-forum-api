@@ -163,6 +163,13 @@ module PostsController
                         forum.posts = forum_posts.to_json
                         forum.save!
 
+                        # Delete all comments
+                        comments = JSON.parse post.comments
+                        comments.each do |comment_id|
+                            comment = Comment.find_by thread: comment_id
+                            comment.delete if comment
+                        end
+
                         post.destroy
                     rescue ActiveRecord::RecordNotFound
                         status = :not_found
