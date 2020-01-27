@@ -28,7 +28,7 @@ module CommentsController
 
             [status, data]
         }
-        render json: {data: data}, status: status
+        render json: data, status: status
     end
 
     def show_comment
@@ -44,7 +44,7 @@ module CommentsController
 
             [status, comment]
         }
-        render json: {data: data}, status: status
+        render json: data, status: status
     end
 
     def create_comment

@@ -5,7 +5,7 @@ class SubForumController < ApplicationController
             data = SubForum.all
             [status, data]
         }
-        render json: {data: data}, status: status
+        render json: data, status: status
     end
 
     def create
@@ -87,7 +87,7 @@ class SubForumController < ApplicationController
             end
             [status, data]
         }
-        render json: {data: data}, status: status
+        render json: data, status: status
     end
 
     def destroy
